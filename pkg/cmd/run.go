@@ -46,7 +46,7 @@ func (c *RunCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{}) s
 	cmd := exec.Command("bash", "-c", fmt.Sprintf(script, command))
 	cmd.Dir = "/"
 	cmd.SysProcAttr = &syscall.SysProcAttr{
-		Cloneflags: syscall.CLONE_NEWUTS | syscall.CLONE_NEWPID | syscall.CLONE_NEWNS,
+		Cloneflags: syscall.CLONE_NEWUTS | syscall.CLONE_NEWPID | syscall.CLONE_NEWNS | syscall.CLONE_NEWNET,
 		Chroot:     c.root,
 	}
 	cmd.Stdin = os.Stdin
