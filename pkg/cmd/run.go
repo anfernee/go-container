@@ -6,10 +6,18 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"strings"
 	"syscall"
 
 	"github.com/google/subcommands"
 )
+
+// extra script to run before running entry point
+// FIXME: It only supports container image with bash in it.
+const script = `
+mount -t proc proc /proc && \
+exec %s
+`
 
 type RunCmd struct {
 	root string
@@ -34,7 +42,8 @@ func (c *RunCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{}) s
 		return subcommands.ExitSuccess
 	}
 
-	cmd := exec.Command(args[0], args[1:]...)
+	command := strings.Join(args, " ")
+	cmd := exec.Command("bash", "-c", fmt.Sprintf(script, command))
 	cmd.Dir = "/"
 	cmd.SysProcAttr = &syscall.SysProcAttr{
 		Cloneflags: syscall.CLONE_NEWUTS | syscall.CLONE_NEWPID | syscall.CLONE_NEWNS,
